@@ -367,15 +367,40 @@ class SetBet extends Controller
     }
     public function CreateBet()
     {
-        //return;
-      $session = $this->generateRandomString(20);
-      $sessionNum = rand(1000000000000,9999999999999);
-      $toadd = Bet::select("*")->orderBy("created_at","desc")->limit(1)->first();
-      if($toadd)
-        Currentbet::insert(["sessionId"=>$session,"inAdd"=>$toadd->carry,"sessionNum"=>$sessionNum]);
-    else
-        Currentbet::insert(["sessionId"=>$session,"sessionNum"=>$sessionNum]);
-      return response("done",200);
+        return DB::transaction(function () {
+
+            $lastBet = Currentbet::orderBy('created_at', 'desc')
+                ->lockForUpdate()
+                ->first();
+
+            $toadd = Bet::orderBy('created_at', 'desc')
+                ->first();
+
+            // Calculate target
+            if ($lastBet->target > 0 && $toadd && $toadd->amount > 0) {
+                $randTarget = $lastBet->target - 1;
+            } elseif ($lastBet->target > 0) {
+                $randTarget = $lastBet->target;
+            } else {
+                $randTarget = rand(10, 15);
+            }
+
+            $data = [
+                'sessionId' => $this->generateRandomString(20),
+                'sessionNum' => rand(1000000000000, 9999999999999),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'target' => $randTarget,
+            ];
+
+            if ($toadd) {
+                $data['inAdd'] = $toadd->carry;
+            }
+
+            Currentbet::insert($data);
+
+            return response('done', 200);
+        });
     }
 
     public function Login(Request $request)
@@ -905,73 +930,189 @@ class SetBet extends Controller
         return response("No user",401);
     }
 
-    public function GetNewSession($checker=false)
-    {
-        $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
-        $prevBets = Bet::select("*")->orderBy("created_at","desc")->limit(10)->get();
-        foreach($prevBets as $pv)
-        {
-            $pv["time"] = explode(' ',$pv->created_at)[1];
-        }
-        $totalTime = Setting::where('name','time')->first()->value;
-        if($bet){
-            if($bet->status != "pending")
-            {
+    // public function GetNewSession($checker=false)
+    // {
+    //     $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
+    //     $prevBets = Bet::select("*")->orderBy("created_at","desc")->limit(10)->get();
+    //     foreach($prevBets as $pv)
+    //     {
+    //         $pv["time"] = explode(' ',$pv->created_at)[1];
+    //     }
+    //     $totalTime = Setting::where('name','time')->first()->value;
+    //     if($bet){
+    //         if($bet->status != "pending")
+    //         {
 
-            $dateTimeNow = time();
-            $betTime = strtotime($bet->created_at);
+    //         $dateTimeNow = time();
+    //         $betTime = strtotime($bet->created_at);
 
-            $diff = $dateTimeNow - $betTime;
-            $diff = $totalTime-$diff ;
+    //         $diff = $dateTimeNow - $betTime;
+    //         $diff = $totalTime-$diff ;
 
-            if($diff < -10)
-            {
+    //         if($diff < -10)
+    //         {
                 
-                $this->CreateBet();
-                $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
-            }
+    //             $this->CreateBet();
+    //             $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
+    //         }
 
             
-            }
-        else
-        {
+    //         }
+    //     else
+    //     {
+    //         $dateTimeNow = time();
+    //         $betTime = strtotime($bet->created_at);
+
+    //         $diff = $dateTimeNow - $betTime;
+            
+    //         $diff = $totalTime-$diff ;
+
+    //         if($diff < -$totalTime)
+    //         {
+    //             Currentbet::where("sessionId",$bet->sessionId)->update(["status"=>"cleared"]);
+    //             $this->CreateBet();
+    //             $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
+    //         }
+    //     }
+    //     }
+    //     else
+    //     {
+    //         $this->CreateBet();
+    //             $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
+    //     }
+        
+
+
+    //     $dateTimeNow = time();
+    //     $betTime = strtotime($bet->created_at);
+
+    //     $diff = $dateTimeNow - $betTime;
+    //     $diff = $totalTime-$diff ;
+    //     $fspeed = Setting::where('name','speedF')->first()->value;
+    //     $sspeed = Setting::where('name','speedS')->first()->value;
+
+    //     if($checker)
+    //     {
+    //         return $bet->sessionId;
+    //     }
+
+    //     return response(["diff"=>$diff,"session"=>$bet->sessionId,"sessionNum"=>$bet->sessionNum,"bets"=>$prevBets,"totalTime"=>$totalTime,"lastChance"=>15,"minLimit"=>5,"fSpeed"=>$fspeed,"sSpeed"=>$sspeed,"stopper"=>3],200);
+    // }
+
+    public function GetNewSession($checker = false)
+    {
+        $totalTime = Setting::where('name', 'time')->value('value');
+
+        /*
+        * Critical section:
+        * Lock the latest Currentbet row so only one request can
+        * decide/create the next session at a time.
+        */
+        $bet = DB::transaction(function () use ($totalTime) {
+
+            // IMPORTANT:
+            // This row is locked until the transaction commits.
+            $bet = Currentbet::orderBy('created_at', 'desc')
+                ->lockForUpdate()
+                ->first();
+
             $dateTimeNow = time();
             $betTime = strtotime($bet->created_at);
 
-            $diff = $dateTimeNow - $betTime;
-            
-            $diff = $totalTime-$diff ;
+            $diff = $totalTime - ($dateTimeNow - $betTime);
 
-            if($diff < -$totalTime)
-            {
-                Currentbet::where("sessionId",$bet->sessionId)->update(["status"=>"cleared"]);
-                $this->CreateBet();
-                $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
+            if ($bet->status != "pending") {
+
+                /*
+                * Current bet has already finished.
+                * Allow a small 10 second buffer before creating
+                * the next session.
+                */
+                if ($diff < -10) {
+
+                    $this->CreateBet();
+
+                    /*
+                    * CreateBet() creates a new Currentbet row.
+                    * Get the newly-created latest row.
+                    */
+                    $bet = Currentbet::orderBy('created_at', 'desc')
+                        ->first();
+                }
+
+            } else {
+
+                /*
+                * Current bet is pending.
+                */
+                if ($diff < -$totalTime) {
+
+                    // Clear the old current bet first.
+                    Currentbet::where('sessionId', $bet->sessionId)
+                        ->update([
+                            'status' => 'cleared'
+                        ]);
+
+                    // Create the next session.
+                    $this->CreateBet();
+
+                    // Get the newly-created current bet.
+                    $bet = Currentbet::orderBy('created_at', 'desc')
+                        ->first();
+                }
             }
+
+            /*
+            * Transaction commits here.
+            *
+            * The row lock is released only after all of the above
+            * operations have completed.
+            */
+            return $bet;
+        });
+
+
+        /*
+        * Everything below this point doesn't need the database lock.
+        */
+
+        $prevBets = Bet::select("*")
+            ->orderBy("created_at", "desc")
+            ->limit(10)
+            ->get();
+
+        foreach ($prevBets as $pv) {
+            $pv["time"] = explode(' ', $pv->created_at)[1];
         }
-        }
-        else
-        {
-            $this->CreateBet();
-                $bet = Currentbet::select("*")->orderBy("created_at","desc")->limit(1)->first();
-        }
-        
 
 
         $dateTimeNow = time();
         $betTime = strtotime($bet->created_at);
 
-        $diff = $dateTimeNow - $betTime;
-        $diff = $totalTime-$diff ;
-        $fspeed = Setting::where('name','speedF')->first()->value;
-        $sspeed = Setting::where('name','speedS')->first()->value;
+        $diff = $totalTime - ($dateTimeNow - $betTime);
 
-        if($checker)
-        {
+
+        $fspeed = Setting::where('name', 'speedF')->value('value');
+        $sspeed = Setting::where('name', 'speedS')->value('value');
+
+
+        if ($checker) {
             return $bet->sessionId;
         }
 
-        return response(["diff"=>$diff,"session"=>$bet->sessionId,"sessionNum"=>$bet->sessionNum,"bets"=>$prevBets,"totalTime"=>$totalTime,"lastChance"=>15,"minLimit"=>5,"fSpeed"=>$fspeed,"sSpeed"=>$sspeed,"stopper"=>3],200);
+
+        return response([
+            "diff"       => $diff,
+            "session"    => $bet->sessionId,
+            "sessionNum" => $bet->sessionNum,
+            "bets"       => $prevBets,
+            "totalTime"  => $totalTime,
+            "lastChance" => 15,
+            "minLimit"   => 5,
+            "fSpeed"     => $fspeed,
+            "sSpeed"     => $sspeed,
+            "stopper"    => 3
+        ], 200);
     }
 
     public function GetMyBets(Request $request)
