@@ -415,8 +415,8 @@ class SetBet extends Controller
 
                 $diff = round(abs($timeNow - $timeLast) / 60,2);
 
-                if($diff < 5)
-                return response("Invalid",203);
+                // if($diff < 5)
+                // return response("Invalid",203);
             }
 
 
