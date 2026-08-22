@@ -9,13 +9,16 @@
 -->
 @php
 use Illuminate\Support\Facades\Session; 
-if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
-{
-  header('location:session');
-}
+
 @endphp
 <html lang="en">
   <head>
+      @if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
+    <script>
+        alert("Session Expired");
+        window.location.href = "{{ url('session') }}";
+    </script>
+@endif
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
@@ -184,6 +187,7 @@ if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
                         <tr>
                           
                           <th>Player</th>
+                          <th>Session (Game Id)</th>
                           <th>Bets on</th>
                           <th>Amount</th>
                           <th>Won Card</th>
@@ -275,7 +279,7 @@ xhttp.onreadystatechange  = function() {
 
       console.log("Preparing for "+element.name);
       var allBets = element.bets.split("|");
-      document.getElementById("report").innerHTML += "<tr><td>"+responses.playerName+"</td><td><div class='badges-list' style='justify-content: left;'><span class='badge bg-blue' style='width:30px;height:30px;font-size:10px;'>J ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[0]+"</div></span><span class='badge bg-azure' style='width:30px;height:30px;font-size:10px;'>J ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[1]+"</div></span><span class='badge bg-indigo' style='width:30px;height:30px;font-size:10px;'>J ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[2]+"</div></span><span class='badge bg-purple' style='width:30px;height:30px;font-size:10px;'>J ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[3]+"</div></span><span class='badge bg-pink' style='width:30px;height:30px;font-size:10px;'>K ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[4]+"</div></span><span class='badge bg-red' style='width:30px;height:30px;font-size:10px;'>K ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[5]+"</div></span><span class='badge bg-orange' style='width:30px;height:30px;font-size:10px;'>K ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[6]+"</div></span><span class='badge bg-yellow' style='width:30px;height:30px;font-size:10px;'>K ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[7]+"</div></span><span class='badge bg-lime' style='width:30px;height:30px;font-size:10px;'>Q ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[8]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[9]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[10]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[11]+"</div></span></td><td>"+element.amount+"</td><td>"+card[element.won]+"</td><td>"+element.win+"</td><td>"+element.time+"</td></tr>";
+      document.getElementById("report").innerHTML += "<tr><td>"+responses.playerName+"</td><td>"+element.session+"</td><td><div class='badges-list' style='justify-content: left;'><span class='badge bg-blue' style='width:30px;height:30px;font-size:10px;'>J ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[0]+"</div></span><span class='badge bg-azure' style='width:30px;height:30px;font-size:10px;'>J ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[1]+"</div></span><span class='badge bg-indigo' style='width:30px;height:30px;font-size:10px;'>J ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[2]+"</div></span><span class='badge bg-purple' style='width:30px;height:30px;font-size:10px;'>J ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[3]+"</div></span><span class='badge bg-pink' style='width:30px;height:30px;font-size:10px;'>K ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[4]+"</div></span><span class='badge bg-red' style='width:30px;height:30px;font-size:10px;'>K ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[5]+"</div></span><span class='badge bg-orange' style='width:30px;height:30px;font-size:10px;'>K ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[6]+"</div></span><span class='badge bg-yellow' style='width:30px;height:30px;font-size:10px;'>K ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[7]+"</div></span><span class='badge bg-lime' style='width:30px;height:30px;font-size:10px;'>Q ❤<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[8]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♠<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[9]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♦<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[10]+"</div></span><span class='badge bg-green' style='width:30px;height:30px;font-size:10px;'>Q ♣<div id='zeroVal' style='font-size:10px;padding-top:3px;'>₹"+allBets[11]+"</div></span></td><td>"+element.amount+"</td><td>"+card[element.won]+"</td><td>"+element.win+"</td><td>"+element.time+"</td></tr>";
                   
       
               

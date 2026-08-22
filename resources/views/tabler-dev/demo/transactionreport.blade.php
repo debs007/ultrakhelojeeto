@@ -9,13 +9,17 @@
 -->
 @php
 use Illuminate\Support\Facades\Session; 
-if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
-{
-  header('location:session');
-}
+
+
 @endphp
 <html lang="en">
   <head>
+       @if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
+    <script>
+        alert("Session Expired");
+        window.location.href = "{{ url('session') }}";
+    </script>
+@endif
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
@@ -192,6 +196,7 @@ if(!Session::has('admin') && !Session::has('stk') && !Session::has('super'))
                           <th>Transfered To</th>
                           <th>Amount</th>
                           <th>Type</th>
+                          <th>Date & Time</th>
                           
                         </tr>
                       </thead>
@@ -275,8 +280,10 @@ xhttp.onreadystatechange  = function() {
     document.getElementById("report").innerHTML = "";
     responses.all.forEach(element => {
 
-      console.log("Preparing for "+element.name);
-      document.getElementById("report").innerHTML += "<tr><td>"+element.payerName+"</td><td>"+element.userName+"</td><td>"+element.amount+"</td><td>"+element.type+"</td></tr>";
+      console.log("Preparing for "+element);
+      const date = new Date(element.created_at);
+      const formateed = date.toLocaleString();
+      document.getElementById("report").innerHTML += "<tr><td>"+element.payerName+"</td><td>"+element.userName+"</td><td>"+element.amount+"</td><td>"+element.type+"</td><td>"+formateed+"</td></tr>";
                   
                 
               

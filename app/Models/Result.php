@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Result extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'session',
-        'totalDisbursed',
-        'created_at',
-        'updated_at',
-    ];
+     protected $fillable = [
+    'session',
+    'totalDisbursed'
+];
 }

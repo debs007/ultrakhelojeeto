@@ -7,16 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bet extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'sessionId',
-        'amount',
-        'disbursed',
-        'percent',
-        'number',
-        'times',
-        'status',
-        'carry',
-    ];
+    'sessionId',
+    'amount',
+    'disbursed',
+    'percent',
+    'number',
+    'times',
+    'status',
+    'carry'
+];
 }

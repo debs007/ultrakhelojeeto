@@ -11,7 +11,11 @@
 use Illuminate\Support\Facades\Session; 
 if(!Session::has('admin'))
 {
-  header('location:session');
+  return redirect('session');
+}
+if(!Session::has('hyper'))
+{
+  return redirect('session');
 }
 @endphp
 <html lang="en">

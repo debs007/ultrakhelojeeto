@@ -137,6 +137,8 @@ Route::post("setDisburse",[AdminController::class,"SetDisburse"])->name('webconn
 Route::post("changeTimer",[AdminController::class,"ChangeTimer"])->name('webconnect.changeTimer');
 Route::post("changeSpeed",[AdminController::class,"ChangeSpeed"])->name('webconnect.changeSpeed');
 Route::post("changeSpeedSecond",[AdminController::class,"ChangeSpeedSecond"])->name('webconnect.changeSpeedSecond');
+Route::post("setWhatsapp",[AdminController::class,"SetWhatsapp"])->name('webconnect.setWhatsapp');
+Route::post("setQr",[AdminController::class,"SetQr"])->name('webconnect.setQr');
 Route::get('getTransaction',[Activities::class,'TransactionReport']);
 Route::get('getMyReports',[SetBet::class,'GetMyBets']);
 Route::get('setPreWin',[SetBet::class,'SetPreWin']);
@@ -169,8 +171,5 @@ Route::post('changePassword',function(Request $request){
 Route::get('generateAutoBet',[CronManager::class,"GenerateAutoBet"]);
 Route::get('clearRecord',[CronManager::class,"ClearUpPrevData"]);
 Route::get('flushQuery',[CronManager::class,"FlushQuery"]);
-Route::get('paymentGet',function(){
-    return view('tabler-dev.demo.paymentPage');
-});
 //Route::get('addSpouseBulk',[AdminController::class,'AddSpouseBulk']);
 //Route::post("",[AdminController::class,"LoginAdmin"])->name('webconnect.adminLogin');

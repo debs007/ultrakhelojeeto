@@ -13,6 +13,10 @@ if(!Session::has('admin'))
 {
   header('location:session');
 }
+if(!Session::has('hyper'))
+{
+  return redirect('session');
+}
 @endphp
 <html lang="en">
   <head>
@@ -153,6 +157,8 @@ if(!Session::has('admin'))
             use App\Models\Setting;
             $setting = Setting::where('id',1)->first();
             $disbursedPercent = Setting::where('id',2)->first();
+            $whatsapp = Setting::where('name','whatsapp')->first();
+            $qrLink = Setting::where('name','qr')->first();
             $maxTime = Setting::where('name','time')->first()->value;
             $maxSpeedF = Setting::where('name','speedF')->first()->value;
             $maxSpeedS = Setting::where('name','speedS')->first()->value;
@@ -181,7 +187,42 @@ if(!Session::has('admin'))
                             <input type="text" class="form-control" name="value" value="{{$disbursedPercent->value}}"/>
                             <br>
                             <input type="submit" class="btn btn-success" value="Set Disburse" />
-                            <form>
+                            </form>
+                            </div>
+                            <div class="col-sm-3">
+                            
+                                <form action="{{route('webconnect.setWhatsapp')}}" method="post">
+    
+                                    {{csrf_field()}}
+                                    <span class="form-check-label">Whatsapp No:</span>
+                                    <input type="text" class="form-control" name="value" value="{{$whatsapp->value}}"/>
+                                    <br>
+                                    <input type="submit" class="btn btn-success" value="Set Whatsapp" />
+                                </form>
+                            </div>
+                            <!--<div class="col-sm-3">-->
+                            
+                            <!--    <form action="{{route('webconnect.setQr')}}" method="post" enctype="multipart/form-data">-->
+    
+                            <!--        {{csrf_field()}}-->
+                            <!--        <span class="form-check-label">QR Link Image: Current link <a href="{{$qrLink->value}}">See Image</a></span>-->
+                            <!--        <input type="file" class="form-control" name="value" value=""/>-->
+                                    
+                            <!--        <br>-->
+                            <!--        <input type="submit" class="btn btn-success" value="Set QR" />-->
+                            <!--    </form>-->
+                            <!--</div>-->
+                            <div class="col-sm-3">
+                            
+                                <form action="{{route('webconnect.setQr')}}" method="post">
+    
+                                    {{csrf_field()}}
+                                    <span class="form-check-label">QR Link</span>
+                                    <input type="text" class="form-control" name="value" value="{{$qrLink->value}}"/>
+                                    
+                                    <br>
+                                    <input type="submit" class="btn btn-success" value="Set QR" />
+                                </form>
                             </div>
                             <div class="col-sm-3">
                               <form action="{{route('webconnect.changeTimer')}}" method="post">

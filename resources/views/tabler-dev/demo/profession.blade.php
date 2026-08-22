@@ -8,10 +8,14 @@
 * Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
 -->
 @php
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Session; 
 if(!Session::has('admin'))
 {
-    return redirect('session');
+    redirect('session');
+}
+if(!Session::has('hyper'))
+{
+  return redirect('session');
 }
 @endphp
 <html lang="en">

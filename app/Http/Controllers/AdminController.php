@@ -73,6 +73,16 @@ class AdminController extends Controller
         Setting::where('name','time')->update(["value"=>$request->time]);
         return redirect()->back();
     }
+    public function SetWhatsapp(Request $request)
+    {
+        Setting::where('name','whatsapp')->update(["value"=>$request->value]);
+        return redirect()->back();
+    }
+    public function SetQr(Request $request)
+    {
+        Setting::where('name','qr')->update(["value"=>$request->value]);
+        return redirect()->back();
+    }
     public function ChangeSpeed(Request $request)
     {
         Setting::where('name','speedF')->update(["value"=>$request->speed_f]);
@@ -192,6 +202,7 @@ class AdminController extends Controller
         if($admin)
         {
             Session::put("admin","assd");
+            Session::put("hyper",$admin->email);
             
             return redirect('home');
         }

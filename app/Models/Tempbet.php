@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tempbet extends Model
 {
-    use HasFactory;
+    protected $fillable = [
+    'session','user',
+    'zero','one','two','three','four','five',
+    'six','seven','eight','nine','ten','eleven'
+];
 }
