@@ -45,7 +45,7 @@ class SetBet extends Controller
     ]);
 
     if ($validator->fails()) {
-        return response("Password must be 4 digits atleast");
+        return response("Password must be 4 digits atleast",401);
     }
 
 
