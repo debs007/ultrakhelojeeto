@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('loginWithOtp',[Users::class,'LoginWithPhone']);
 Route::post('register',[SetBet::class,'Register']);
 Route::post('loginWithPassword',[Users::class,'LoginWithPassword']);
-Route::post('register',[Users::class,'Register']);
+//Route::post('register',[Users::class,'Register']);
 Route::post('getMembers',[Users::class,'GetMembers']);
 Route::post('setProfession',[Users::class,'SetProfessions']);
 Route::get('getProfession',[Users::class,'GetProfessions']);
