@@ -56,7 +56,7 @@ class SetBet extends Controller
         return response("Not a valid email address",403);
     }
 
-        $exists = User::where('name',$request->userName);
+        $exists = User::where('name',$request->userName)->first();
 
         if($exists)
          {
