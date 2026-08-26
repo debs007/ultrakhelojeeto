@@ -31,6 +31,43 @@ class SetBet extends Controller
 
     }
 
+    function Register(Request $request)
+    {
+
+    $validator = Validator::make($request->all(), [
+        'password' => [
+            'required',
+            'string',
+            'min:4',
+            'regex:/\S/',
+        ],
+    ]);
+
+    if ($validator->fails()) {
+        return response("Password must be 4 digits atleast");
+    }
+
+
+
+    if (filter_var($request->userName, FILTER_VALIDATE_EMAIL)) {
+    // Valid email
+    } else {
+        return response("Not a valid email address",403);
+    }
+
+        $exists = User::where('name',$request->userName);
+
+        if($exists)
+         {
+            return response("This email address exists!",403);
+         } 
+        
+        User::insert(["name"=>$request->userName,"password"=>$request->password,"token"=>$this->generateRandomString(12),"stockist"=>$request->stockist,"type"=>$request->type,"percent"=>$request->percent]);
+        $usr = User::where('name',$request->userName)->first();
+        return response(["data"=>$usr],200);
+         
+    }
+
     public function TakeABackup()
     {
         $allUsers = User::select('*')->get();
