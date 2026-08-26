@@ -19,6 +19,7 @@ use App\Models\Tempholder;
 use App\Models\Moneytransfer;
 use Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class SetBet extends Controller
 {
