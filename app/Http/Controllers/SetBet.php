@@ -36,6 +36,10 @@ class SetBet extends Controller
     {
 
     $validator = Validator::make($request->all(), [
+        'userName'=> [
+            'required',
+            'string',
+        ],
         'password' => [
             'required',
             'string',
@@ -50,17 +54,17 @@ class SetBet extends Controller
 
 
 
-    if (filter_var($request->userName, FILTER_VALIDATE_EMAIL)) {
-    // Valid email
-    } else {
-        return response("Not a valid email address",403);
-    }
+    // if (filter_var($request->userName, FILTER_VALIDATE_EMAIL)) {
+    // // Valid email
+    // } else {
+    //     return response("Not a valid email address",403);
+    // }
 
         $exists = User::where('name',$request->userName)->first();
 
         if($exists)
          {
-            return response("This email address exists!",403);
+            return response("This username or email address exists!",403);
          } 
         
         User::insert(["name"=>$request->userName,"password"=>$request->password,"token"=>$this->generateRandomString(12),"stockist"=>$request->stockist,"type"=>$request->type,"percent"=>$request->percent]);
@@ -82,8 +86,23 @@ class SetBet extends Controller
     
     public function TransferBalance(Request $request)
     {
+
+        if($request->amount <= 0)
+            {
+                return response([
+                "response_msg"=>"Bad result"
+                ],402);
+            }
+
         $me = User::where('id',$request->id)->first();
         $other = User::where('name',$request->other)->first();
+
+        if($me->name == $other->name)
+            {
+                return response([
+                "response_msg"=>"Bad result"
+                ],402);
+            }
         
         if($me && $other)
             if($me->balance >= $request->amount)
